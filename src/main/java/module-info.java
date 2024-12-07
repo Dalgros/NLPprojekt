@@ -1,4 +1,4 @@
-module com.example.nlp2 {
+module com.example.nlpprojekt {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
@@ -7,8 +7,9 @@ module com.example.nlp2 {
     requires com.dlsc.formsfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
-    requires eu.hansolo.tilesfx;
-
-    opens com.example.nlpprojekt to javafx.fxml;
+    requires org.jsoup;
     exports com.example.nlpprojekt;
+    opens com.example.nlpprojekt to javafx.fxml;
+    exports com.example.nlpprojekt.wiki;
+    opens com.example.nlpprojekt.wiki to javafx.fxml;
 }
