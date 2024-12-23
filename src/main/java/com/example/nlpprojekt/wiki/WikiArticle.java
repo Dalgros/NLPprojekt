@@ -2,7 +2,9 @@ package com.example.nlpprojekt.wiki;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -16,6 +18,7 @@ public class WikiArticle {
     private String link;
     private String text;
     private List<String> nextArticles = new ArrayList<>();
+    private HashMap<String, AtomicInteger> BoW;
 
     public WikiArticle(String link) throws IOException, HttpStatusException {
         this.link = link;
@@ -51,5 +54,9 @@ public class WikiArticle {
 
     public List<String> getNextArticles() {
         return nextArticles;
+    }
+
+    public void setBoW(HashMap<String, AtomicInteger> boW) {
+        BoW = boW;
     }
 }

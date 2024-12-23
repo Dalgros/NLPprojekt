@@ -23,7 +23,7 @@ public class HelloApplication extends Application {
     }
 
     public static void main(String[] args) throws IOException {
-        List<WikiArticle> biologyArticles = WikipediaManager.getWikiArticles("https://en.wikipedia.org/wiki/Biology", 2,2000);
+        List<WikiArticle> biologyArticles = WikipediaManager.getWikiArticles("https://en.wikipedia.org/wiki/Biology", 0,2000);
         launch();
     }
 }
