@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class WikipediaManager {
+public class ArticleManager {
     private static Map<String, WikiArticle> allArticles = new HashMap<>();
     private static List<String> stopWords;
     private static StanfordCoreNLP pipeline;
@@ -95,12 +95,38 @@ public class WikipediaManager {
         wikiArticle.setBoW(BoW);
     }
 
-    static boolean isWord(CoreLabel l){
+    private static boolean isWord(CoreLabel l){
         return !l.tag().equals("POS") && !l.tag().equals("SYM") && !l.tag().equals(".") && !l.tag().equals("HYPH") &&
                 !l.tag().equals("''") && !l.tag().equals("``") && !l.tag().equals(",") && !l.tag().equals("-RRB-") &&
                 !l.tag().equals("-LRB-") && !l.tag().equals(":") && !l.tag().equals("CD") && !l.tag().equals("$") &&
                 !l.tag().equals("£") && !l.tag().equals("NN") && !l.tag().equals("CC") && !l.tag().equals("NFP") &&
                 !l.tag().equals("NNS") && !l.lemma().contains(",");
     }
+
+    public static double calculateCosineSimilarity(double[] vectorA, double[] vectorB) {
+        if (vectorA.length != vectorB.length) {
+            throw new IllegalArgumentException("Wektory muszą mieć tę samą długość.");
+        }
+
+        double dotProduct = 0.0;
+        double normA = 0.0;
+        double normB = 0.0;
+
+        for (int i = 0; i < vectorA.length; i++) {
+            dotProduct += vectorA[i] * vectorB[i];
+            normA += Math.pow(vectorA[i], 2);
+            normB += Math.pow(vectorB[i], 2);
+        }
+
+        normA = Math.sqrt(normA);
+        normB = Math.sqrt(normB);
+
+        if (normA == 0 || normB == 0) {
+            throw new IllegalArgumentException("Wektory nie mogą być zerowe.");
+        }
+
+        return dotProduct / (normA * normB);
+    }
+
 
 }
