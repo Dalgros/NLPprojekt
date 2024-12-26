@@ -1,6 +1,5 @@
 package com.example.nlpprojekt;
 
-import com.example.nlpprojekt.wiki.WikiArticle;
 import com.example.nlpprojekt.wiki.ArticleManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -8,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.List;
 
 public class HelloApplication extends Application {
     @Override
@@ -21,7 +19,11 @@ public class HelloApplication extends Application {
     }
 
     public static void main(String[] args) throws IOException {
-        List<WikiArticle> biologyArticles = ArticleManager.getWikiArticles("https://en.wikipedia.org/wiki/Biology", 0,2000);
+        ArticleManager.loadVectors();
+        ArticleManager.addWikiArticles("https://en.wikipedia.org/wiki/Biology", 0,2000);
+        ArticleManager.addWikiArticles("https://en.wikipedia.org/wiki/History", 0,2000);
+        ArticleManager.addWikiArticles("https://en.wikipedia.org/wiki/Chemistry", 0,2000);
+        ArticleManager.saveVectorsToFile();
         launch();
     }
 }

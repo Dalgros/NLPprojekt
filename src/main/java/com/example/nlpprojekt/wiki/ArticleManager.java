@@ -6,13 +6,15 @@ import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ArticleManager {
+
+    private static HashMap<String, AtomicInteger> documentsBagOfWords = new LinkedHashMap<>();
     private static Map<String, WikiArticle> allArticles = new HashMap<>();
     private static List<String> stopWords;
     private static StanfordCoreNLP pipeline;
@@ -28,14 +30,16 @@ public class ArticleManager {
         props.setProperty("coref.algorithm", "neural");
         pipeline = new StanfordCoreNLP(props);
     }
-    public static List<WikiArticle> getWikiArticles(String startLink, int levels, int max) throws IOException {
+    public static void addWikiArticles(String startLink, int levels, int max) throws IOException {
         Map<Integer, List<WikiArticle>> articleLevels = new HashMap<>();
+        List<WikiArticle> allCurrentArticles = new ArrayList<>();
 
         List<WikiArticle> firstLevelArticles = new ArrayList<>();
         WikiArticle wiki = new WikiArticle(startLink);
         firstLevelArticles.add(wiki);
         articleLevels.put(1, firstLevelArticles);
         allArticles.put(wiki.getLink(), wiki);
+        allCurrentArticles.add(wiki);
 
         outerloop:
         for(int i=1; i<=levels; i++){
@@ -53,6 +57,7 @@ public class ArticleManager {
 
                     if(!allArticles.containsKey(wa.getLink())){
                         allArticles.put(wa.getLink(), wa);
+                        allCurrentArticles.add(wa);
                         System.out.println("Wiki  found: " + allArticles.size());
                         articleLevels.get(i+1).add(wa);
 
@@ -64,11 +69,7 @@ public class ArticleManager {
             }
         }
 
-        List<WikiArticle> articleList = allArticles.values().stream().toList();
-        articleList.forEach(wikiArticle -> parseArticle(wikiArticle, stopWords));
-
-        return articleList;
-
+        allCurrentArticles.forEach(wikiArticle -> parseArticle(wikiArticle, stopWords));
     }
 
     public static void parseArticle(WikiArticle wikiArticle, List<String> stopWords)  {
@@ -76,7 +77,7 @@ public class ArticleManager {
         CoreDocument document = new CoreDocument(wikiArticle.getText());
         pipeline.annotate(document);
 
-        System.out.println("Cuurent article: " + wikiArticle.getLink());
+        System.out.println("Current article: " + wikiArticle.getLink());
         for(CoreSentence sentence : document.sentences()) {
             //tokenizacja
             for (CoreLabel label : sentence.tokens()) {
@@ -93,6 +94,17 @@ public class ArticleManager {
             }
         }
         wikiArticle.setBoW(BoW);
+        addToBagOfWords(BoW.keySet());
+    }
+
+    private static void addToBagOfWords(Set<String> dictionary) {
+        for(String word : dictionary){
+            if (documentsBagOfWords.containsKey(word)) {
+                documentsBagOfWords.get(word).incrementAndGet();
+            } else {
+                documentsBagOfWords.put(word, new AtomicInteger(1));
+            }
+        }
     }
 
     private static boolean isWord(CoreLabel l){
@@ -128,5 +140,56 @@ public class ArticleManager {
         return dotProduct / (normA * normB);
     }
 
+    public static void saveVectorsToFile() throws IOException {
+        BufferedWriter dictionaryWriter = new BufferedWriter(new FileWriter("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/dictionary.txt"));
+
+        for (Map.Entry<String,AtomicInteger> entry : documentsBagOfWords.entrySet()){
+            dictionaryWriter.write(entry.getKey() + ":" + entry.getValue());
+            dictionaryWriter.newLine();
+        }
+
+        BufferedWriter articlesWriter = new BufferedWriter(new FileWriter("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/article_vectors.txt"));
+
+        for(Map.Entry<String,WikiArticle> article : allArticles.entrySet()){
+            articlesWriter.write(article.getKey() + "|||");
+            StringBuilder bowLine = new StringBuilder();
+            for(Map.Entry<String, AtomicInteger> entry : article.getValue().getBoW().entrySet()){
+                bowLine.append(entry.getKey()).append(":").append(entry.getValue()).append(";");
+            }
+
+            articlesWriter.write(bowLine.substring(0, bowLine.toString().length()-1));
+            articlesWriter.newLine();
+        }
+
+        articlesWriter.close();
+        dictionaryWriter.close();
+    }
+
+    public static void loadVectors() throws IOException {
+        BufferedReader dictionaryReader = new BufferedReader(new FileReader("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/dictionary.txt"));
+        String dictionaryLine;
+
+        while ((dictionaryLine = dictionaryReader.readLine()) != null) {
+            String word = dictionaryLine.substring(0, dictionaryLine.indexOf(":"));
+            AtomicInteger count = new AtomicInteger(Integer.parseInt(dictionaryLine.substring(dictionaryLine.indexOf(":")+1)));
+            documentsBagOfWords.put(word, count);
+        }
+        dictionaryReader.close();
+
+        BufferedReader articlesReader = new BufferedReader(new FileReader("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/article_vectors.txt"));
+        String articlesLine;
+
+        while ((articlesLine = articlesReader.readLine()) != null) {
+            HashMap<String, AtomicInteger> BoW = new HashMap<>();
+            String link = articlesLine.substring(0, articlesLine.indexOf("|||"));
+            List<String> entries = Arrays.stream(articlesLine.substring(articlesLine.indexOf("|||")+3).split(";")).toList();
+            for(String entry : entries){
+                String[] pair = entry.split(":");
+                BoW.put(pair[0],  new AtomicInteger(Integer.parseInt(pair[1])));
+            }
+            allArticles.put(link, new WikiArticle(link, BoW));
+        }
+        articlesReader.close();
+    }
 
 }

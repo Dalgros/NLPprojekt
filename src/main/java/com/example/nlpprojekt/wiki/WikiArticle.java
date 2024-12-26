@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +19,7 @@ public class WikiArticle {
     private List<String> nextArticles = new ArrayList<>();
     private HashMap<String, AtomicInteger> BoW;
 
-    public WikiArticle(String link) throws IOException, HttpStatusException {
+    public WikiArticle(String link) throws IOException {
         this.link = link;
 
         //get the html content of wiki page
@@ -44,6 +43,12 @@ public class WikiArticle {
         this.text = plainText.toString().replaceAll("\\[(\\d+?)\\]", "");
     }
 
+    public WikiArticle(String link, HashMap<String, AtomicInteger> BoW) {
+        this.link = link;
+        this.BoW = BoW;
+    }
+
+
     public String getLink() {
         return link;
     }
@@ -59,4 +64,9 @@ public class WikiArticle {
     public void setBoW(HashMap<String, AtomicInteger> boW) {
         BoW = boW;
     }
+
+    public HashMap<String, AtomicInteger> getBoW() {
+        return BoW;
+    }
+
 }
