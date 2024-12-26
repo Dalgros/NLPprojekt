@@ -1,5 +1,6 @@
 package com.example.nlpprojekt.wiki;
 
+import javafx.scene.control.ProgressBar;
 import org.jsoup.HttpStatusException;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.CoreDocument;
@@ -30,7 +31,7 @@ public class ArticleManager {
         props.setProperty("coref.algorithm", "neural");
         pipeline = new StanfordCoreNLP(props);
     }
-    public static void addWikiArticles(String startLink, int levels, int max) throws IOException {
+    public static int addWikiArticles(String startLink, int levels, int max, ProgressBar progressBar) throws IOException {
         Map<Integer, List<WikiArticle>> articleLevels = new HashMap<>();
         List<WikiArticle> allCurrentArticles = new ArrayList<>();
 
@@ -47,6 +48,7 @@ public class ArticleManager {
                 articleLevels.put(i+1, new ArrayList<>());
 
                 for(String articleLink : article.getNextArticles()){
+                    progressBar.setProgress(allCurrentArticles.size()/article.getNextArticles().size());
                     WikiArticle wa;
                     try{
                         wa = new WikiArticle(articleLink);
@@ -61,7 +63,7 @@ public class ArticleManager {
                         System.out.println("Wiki  found: " + allArticles.size());
                         articleLevels.get(i+1).add(wa);
 
-                        if(allArticles.size() >= max){
+                        if(allCurrentArticles.size() >= max){
                             break outerloop;
                         }
                     }
@@ -70,6 +72,7 @@ public class ArticleManager {
         }
 
         allCurrentArticles.forEach(wikiArticle -> parseArticle(wikiArticle, stopWords));
+        return allCurrentArticles.size();
     }
 
     public static void parseArticle(WikiArticle wikiArticle, List<String> stopWords)  {
@@ -140,7 +143,7 @@ public class ArticleManager {
         return dotProduct / (normA * normB);
     }
 
-    public static void saveVectorsToFile() throws IOException {
+    public static void saveVectorsToFiles() throws IOException {
         BufferedWriter dictionaryWriter = new BufferedWriter(new FileWriter("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/dictionary.txt"));
 
         for (Map.Entry<String,AtomicInteger> entry : documentsBagOfWords.entrySet()){
@@ -190,6 +193,10 @@ public class ArticleManager {
             allArticles.put(link, new WikiArticle(link, BoW));
         }
         articlesReader.close();
+    }
+
+    public static int getNumberOfArticles(){
+        return allArticles.size();
     }
 
 }
