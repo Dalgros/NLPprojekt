@@ -47,6 +47,7 @@ public class MainController {
     @FXML
     public void search(ActionEvent actionEvent) {
         resultText.setText("The best result is: " + searchInput.getText());
+        //should be TextArea or Label?
     }
 
 
