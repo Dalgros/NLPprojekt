@@ -11,10 +11,9 @@ import javafx.scene.text.TextFlow;
 import javafx.scene.control.Alert.AlertType;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -57,19 +56,23 @@ public class MainController {
             MainApplication.hostServices.showDocument(source.getText()); // Open the hyperlink's text as a URL
         };
 
-        HashMap<String, AtomicInteger> inputBoW = ArticleManager.parseTextAndGetBOW(searchInput.getText());
+        Map<String, Double> similarArticles = ArticleManager.calculateSimilaritiesToInput(searchInput.getText());
 
-        Text textBeforeLink = new Text("Visit the following link: \n");
+        Map<String, Double> sortedMap = new LinkedHashMap<>();
+        similarArticles.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));
 
-        // Create a Hyperlink
-        Hyperlink link1 = new Hyperlink("https://en.wikipedia.org/wiki/Computer");
-        Hyperlink link2 = new Hyperlink("https://en.wikipedia.org/wiki/Biology");
+        Text textBeforeLink = new Text("The most similar articles are the following:");
+        resultText.getChildren().add(textBeforeLink);
 
-        link1.setOnAction(openLinkHandler);
-        link2.setOnAction(openLinkHandler);
-
-        Text textAfterLink = new Text("\n for more information.");
-        resultText.getChildren().addAll(textBeforeLink, link1, link2, textAfterLink);
+        for(Map.Entry<String, Double> articleEntry : sortedMap.entrySet()) {
+            Text entryText = new Text("\nSim: " + String.format("%.5f", articleEntry.getValue()) + " | ");
+            Hyperlink link = new Hyperlink(articleEntry.getKey());
+            link.setOnAction(openLinkHandler);
+            resultText.getChildren().addAll(entryText, link);
+        }
     }
 
 

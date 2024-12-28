@@ -1,9 +1,7 @@
 package com.example.nlpprojekt.wiki;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jsoup.Jsoup;
@@ -17,7 +15,8 @@ public class WikiArticle {
     private String link;
     private String text;
     private List<String> nextArticles = new ArrayList<>();
-    private HashMap<String, AtomicInteger> BoW;
+    private Map<String, AtomicInteger> BoW;
+    private Map<String, Double> tfidf;
 
     public WikiArticle(String link) throws IOException {
         this.link = link;
@@ -43,7 +42,7 @@ public class WikiArticle {
         this.text = plainText.toString().replaceAll("\\[(\\d+?)\\]", "");
     }
 
-    public WikiArticle(String link, HashMap<String, AtomicInteger> BoW) {
+    public WikiArticle(String link, Map<String, AtomicInteger> BoW) {
         this.link = link;
         this.BoW = BoW;
     }
@@ -61,12 +60,21 @@ public class WikiArticle {
         return nextArticles;
     }
 
-    public void setBoW(HashMap<String, AtomicInteger> boW) {
-        BoW = boW;
+    public void setBoW(Map<String, AtomicInteger> boW) {
+        this. BoW = boW;
     }
 
-    public HashMap<String, AtomicInteger> getBoW() {
+    public Map<String, AtomicInteger> getBoW() {
         return BoW;
     }
+
+    public void setTFIDF(Map<String, Double> tfidf) {
+        this.tfidf = tfidf;
+    }
+
+    public Collection<Double> getTFIDF(){
+        return tfidf.values();
+    }
+
 
 }

@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ArticleManager {
 
-    private static HashMap<String, AtomicInteger> documentsBagOfWords = new LinkedHashMap<>();
-    private static Map<String, WikiArticle> allArticles = new HashMap<>();
+    private static Map<String, AtomicInteger> documentsBagOfWords = new LinkedHashMap<>();
+    private static Map<String, WikiArticle> allArticles = new LinkedHashMap<>();
     private static List<String> stopWords;
     private static StanfordCoreNLP pipeline;
 
@@ -122,7 +122,50 @@ public class ArticleManager {
                 !l.tag().equals("£") && !l.tag().equals("CC") && !l.tag().equals("NFP") && !l.lemma().contains(",");
     }
 
-    public static double calculateCosineSimilarity(double[] vectorA, double[] vectorB) {
+    public static void recalculateAllTFIDF() {
+        allArticles.values().forEach(article -> article.setTFIDF(calculateTFIDF(article.getBoW())));
+    }
+
+    public static Map<String, Double> calculateTFIDF(Map<String, AtomicInteger> inputBoW) {
+        Map<String, Double> localTFIDF = new LinkedHashMap<>();
+        for(Map.Entry<String,AtomicInteger> entry : documentsBagOfWords.entrySet()){
+            String word = entry.getKey();
+            double tfidf = 0.0;
+
+            if (inputBoW.containsKey(word)){
+                tfidf = inputBoW.get(word).doubleValue() * Math.log((double) allArticles.size() / entry.getValue().doubleValue());
+            }
+            localTFIDF.put(word, tfidf);
+        }
+
+        return localTFIDF;
+    }
+
+    public static Map<String, Double> calculateSimilaritiesToInput(String text) {
+        Map<String, AtomicInteger> inputBoW = parseTextAndGetBOW(text);
+
+        recalculateAllTFIDF();
+
+        Map<String, Double> inputTFIDF = calculateTFIDF(inputBoW);
+
+        Map<String, Double> result = new HashMap<>();
+        for(Map.Entry<String, WikiArticle> articleEntry: allArticles.entrySet()){
+            double similarity = calculateCosineSimilarity(inputTFIDF.values(), articleEntry.getValue().getTFIDF());
+            result.put(articleEntry.getKey(), similarity);
+        }
+
+        return result;
+    }
+
+    public static double calculateCosineSimilarity(Collection<Double> setA, Collection<Double> setB) {
+        double[] vectorA = setA.stream()
+                .mapToDouble(Double::doubleValue)
+                .toArray();
+        double[] vectorB = setB.stream()
+                .mapToDouble(Double::doubleValue) // Unbox Double to double
+                .toArray();
+
+
         if (vectorA.length != vectorB.length) {
             throw new IllegalArgumentException("Wektory muszą mieć tę samą długość.");
         }
