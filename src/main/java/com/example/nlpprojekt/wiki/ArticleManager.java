@@ -71,16 +71,21 @@ public class ArticleManager {
             }
         }
 
-        allCurrentArticles.forEach(wikiArticle -> parseArticle(wikiArticle, stopWords));
+        for(WikiArticle wikiArticle : allCurrentArticles){
+            System.out.println("Current article: " + wikiArticle.getLink());
+            HashMap<String, AtomicInteger> BoW = parseTextAndGetBOW(wikiArticle.getText());
+            wikiArticle.setBoW(BoW);
+            addToBagOfWords(BoW.keySet());
+        }
+
         return allCurrentArticles.size();
     }
 
-    public static void parseArticle(WikiArticle wikiArticle, List<String> stopWords)  {
+    public static  HashMap<String, AtomicInteger> parseTextAndGetBOW(String text)  {
         HashMap<String, AtomicInteger> BoW = new HashMap<>();
-        CoreDocument document = new CoreDocument(wikiArticle.getText());
+        CoreDocument document = new CoreDocument(text);
         pipeline.annotate(document);
 
-        System.out.println("Current article: " + wikiArticle.getLink());
         for(CoreSentence sentence : document.sentences()) {
             //tokenizacja
             for (CoreLabel label : sentence.tokens()) {
@@ -96,8 +101,8 @@ public class ArticleManager {
                 }
             }
         }
-        wikiArticle.setBoW(BoW);
-        addToBagOfWords(BoW.keySet());
+
+        return BoW;
     }
 
     private static void addToBagOfWords(Set<String> dictionary) {
@@ -114,8 +119,7 @@ public class ArticleManager {
         return !l.tag().equals("POS") && !l.tag().equals("SYM") && !l.tag().equals(".") && !l.tag().equals("HYPH") &&
                 !l.tag().equals("''") && !l.tag().equals("``") && !l.tag().equals(",") && !l.tag().equals("-RRB-") &&
                 !l.tag().equals("-LRB-") && !l.tag().equals(":") && !l.tag().equals("CD") && !l.tag().equals("$") &&
-                !l.tag().equals("£") && !l.tag().equals("NN") && !l.tag().equals("CC") && !l.tag().equals("NFP") &&
-                !l.tag().equals("NNS") && !l.lemma().contains(",");
+                !l.tag().equals("£") && !l.tag().equals("CC") && !l.tag().equals("NFP") && !l.lemma().contains(",");
     }
 
     public static double calculateCosineSimilarity(double[] vectorA, double[] vectorB) {
