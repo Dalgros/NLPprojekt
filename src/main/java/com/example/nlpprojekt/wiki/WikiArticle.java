@@ -8,6 +8,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 public class WikiArticle {
 
@@ -17,6 +18,8 @@ public class WikiArticle {
     private List<String> nextArticles = new ArrayList<>();
     private Map<String, AtomicInteger> BoW;
     private Map<String, Double> tfidf;
+
+    private INDArray word2VecSummedVector;
 
     public WikiArticle(String link) throws IOException {
         this.link = link;
@@ -76,5 +79,11 @@ public class WikiArticle {
         return tfidf.values();
     }
 
+    public INDArray getWord2VecSummedVector() {
+        return word2VecSummedVector;
+    }
 
+    public void setWord2VecSummedVector(INDArray word2VecSummedVector) {
+        this.word2VecSummedVector = word2VecSummedVector;
+    }
 }

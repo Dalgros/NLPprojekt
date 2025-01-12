@@ -9,6 +9,8 @@ module com.example.nlpprojekt {
     requires org.kordamp.bootstrapfx.core;
     requires org.jsoup;
     requires edu.stanford.nlp.corenlp;
+    requires deeplearning4j.nlp;
+    requires nd4j.api;
     exports com.example.nlpprojekt;
     opens com.example.nlpprojekt to javafx.fxml;
     exports com.example.nlpprojekt.wiki;

@@ -1,7 +1,6 @@
 package com.example.nlpprojekt;
 
 import com.example.nlpprojekt.wiki.ArticleManager;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -12,8 +11,6 @@ import javafx.scene.control.Alert.AlertType;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class MainController {
 
