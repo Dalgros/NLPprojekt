@@ -8,18 +8,17 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 public class WikiArticle {
 
-    private static String WIKI_URL_BASE = "https://en.wikipedia.org/";
+    private static String WIKI_URL_BASE = "https://en.wikipedia.org";
     private String link;
     private String text;
     private List<String> nextArticles = new ArrayList<>();
     private Map<String, AtomicInteger> BoW;
     private Map<String, Double> tfidf;
 
-    private INDArray word2VecSummedVector;
+    private List<Double> word2VecSummedVector;
 
     public WikiArticle(String link) throws IOException {
         this.link = link;
@@ -38,7 +37,9 @@ public class WikiArticle {
             Elements referencedArticles = e.getElementsByAttribute("href");
             for(Element href: referencedArticles){
                 String hrefValue = href.attribute("href").getValue();
-                if (!hrefValue.startsWith("#cite") && !hrefValue.startsWith("https://") && !hrefValue.startsWith("/w/index.php?"))
+                // if (!hrefValue.startsWith("#cite") && !hrefValue.startsWith("https://") &&
+                //        !hrefValue.startsWith("/w/index.php?") && !hrefValue.contains("mw-data:TemplateStyles"))
+                if(hrefValue.startsWith("/wiki/"))
                     nextArticles.add(WIKI_URL_BASE + href.attribute("href").getValue());
             }
         }
@@ -79,11 +80,11 @@ public class WikiArticle {
         return tfidf.values();
     }
 
-    public INDArray getWord2VecSummedVector() {
+    public List<Double> getWord2VecSummedVector() {
         return word2VecSummedVector;
     }
 
-    public void setWord2VecSummedVector(INDArray word2VecSummedVector) {
+    public void setWord2VecSummedVector(List<Double> word2VecSummedVector) {
         this.word2VecSummedVector = word2VecSummedVector;
     }
 }

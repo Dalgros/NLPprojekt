@@ -12,10 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 public class ArticleManager {
 
@@ -28,7 +28,7 @@ public class ArticleManager {
     static{
         try {
             stopWords = Files.readAllLines(Paths.get("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/stopwords-en.txt"));
-            wordVectors = WordVectorSerializer.loadStaticModel(new File("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/GoogleNews-vectors-negative300.bin"));
+            //wordVectors = WordVectorSerializer.loadStaticModel(new File("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/GoogleNews-vectors-negative300.bin"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -82,7 +82,7 @@ public class ArticleManager {
             HashMap<String, AtomicInteger> BoW = parseTextAndGetBOW(wikiArticle.getText());
             wikiArticle.setBoW(BoW);
             addToBagOfWords(BoW.keySet());
-            wikiArticle.setWord2VecSummedVector(getSummedEmbedding(BoW.keySet()));
+            //wikiArticle.setWord2VecSummedVector(getSummedEmbedding(BoW.keySet()));
         }
 
         return allCurrentArticles.size();
@@ -253,38 +253,28 @@ public class ArticleManager {
         return allArticles.size();
     }
 
-    /**
-     * Funkcja oblicza sumę embeddingów dla listy słów.
-     *
-     * @param words Lista słów
-     * @return Suma embeddingów jako INDArray
-     */
-    public static INDArray getSummedEmbedding(Set<String> words) {
-        INDArray summedVector = null;
+    public static List<Double> getSummedEmbedding(Set<String> words) {
+        double[] summedVector = null;
 
         for (String word : words) {
             if (wordVectors.hasWord(word)) { // Sprawdź, czy słowo istnieje w modelu
-                INDArray wordVector = wordVectors.getWordVectorMatrix(word);
+                double[] wordVector = wordVectors.getWordVector(word);
 
                 if (summedVector == null) {
-                    // Inicjalizuj wektor sumy jako wektor pierwszego słowa
-                    summedVector = wordVector.dup();
-                } else {
-                    // Dodaj embedding do istniejącej sumy
-                    summedVector.addi(wordVector);
+                    // Zainicjalizuj sumę jako kopię wektora pierwszego słowa
+                    summedVector = new double[wordVector.length];
+                }
+
+                // Dodaj bieżący embedding do wektora sumy
+                for (int i = 0; i < wordVector.length; i++) {
+                    summedVector[i] += wordVector[i];
                 }
             } else {
                 System.out.println("Słowo nieznane (OOV): " + word);
             }
         }
 
-        // Jeśli żadne słowo nie miało embeddingu, zwróć wektor zerowy
-        if (summedVector == null) {
-            System.out.println("Żadne słowo nie zostało znalezione w modelu.");
-            return wordVectors.getWordVectorMatrix("UNK").mul(0); // Zakładamy, że "UNK" to słowo nieznane
-        }
-
-        return summedVector;
+        return Arrays.stream(summedVector).boxed().collect(Collectors.toList());
     }
 
 }
