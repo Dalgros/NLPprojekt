@@ -37,7 +37,7 @@ public class ArticleManager {
         props.setProperty("coref.algorithm", "neural");
         pipeline = new StanfordCoreNLP(props);
     }
-    public static int addWikiArticles(String startLink, int levels, int max, ProgressBar progressBar) throws IOException {
+    public static int addWikiArticles(String startLink, int levels, int max) throws IOException {
         Map<Integer, List<WikiArticle>> articleLevels = new HashMap<>();
         List<WikiArticle> allCurrentArticles = new ArrayList<>();
 
@@ -54,7 +54,6 @@ public class ArticleManager {
                 articleLevels.put(i+1, new ArrayList<>());
 
                 for(String articleLink : article.getNextArticles()){
-                    progressBar.setProgress(allCurrentArticles.size()/article.getNextArticles().size());
                     WikiArticle wa;
                     try{
                         wa = new WikiArticle(articleLink);
@@ -164,11 +163,11 @@ public class ArticleManager {
         return result;
     }
 
-    public static double calculateCosineSimilarity(Collection<Double> setA, Collection<Double> setB) {
-        double[] vectorA = setA.stream()
+    public static double calculateCosineSimilarity(Collection<Double> inputSet, Collection<Double> articleSet) {
+        double[] vectorA = inputSet.stream()
                 .mapToDouble(Double::doubleValue)
                 .toArray();
-        double[] vectorB = setB.stream()
+        double[] vectorB = articleSet.stream()
                 .mapToDouble(Double::doubleValue) // Unbox Double to double
                 .toArray();
 

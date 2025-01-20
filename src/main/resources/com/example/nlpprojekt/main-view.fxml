@@ -2,69 +2,66 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
 
-<VBox alignment="CENTER" prefHeight="358.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nlpprojekt.MainController">
-   <children>
-      <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-        <tabs>
-          <Tab text="Wyszukaj">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <HBox layoutY="-1.0" prefHeight="40.0" prefWidth="640.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <TextField fx:id="searchInput" prefHeight="26.0" prefWidth="551.0" />
-                              <Button mnemonicParsing="false" onAction="#search" text="Wyszukaj">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </Button>
-                           </children>
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding>
-                        </HBox>
-                        <TextFlow fx:id="resultText" layoutX="55.0" layoutY="50.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
-                     </children></AnchorPane>
-            </content>
-          </Tab>
-          <Tab text="Dodaj">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="143.0" prefWidth="640.0">
-                     <children>
-                        <TextFlow fx:id="docSummaryTextFlow" prefHeight="60.0" prefWidth="640.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding></TextFlow>
-                        <HBox layoutY="62.0" prefHeight="40.0" prefWidth="640.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
-                           <children>
-                              <TextField fx:id="linkInput" prefHeight="26.0" prefWidth="384.0" promptText="Wpisz link" />
-                              <Spinner fx:id="levelSpinner" editable="true" prefHeight="26.0" prefWidth="77.0" />
-                              <Spinner fx:id="maxSpinner" editable="true" prefHeight="26.0" prefWidth="98.0" />
-                              <Button mnemonicParsing="false" onAction="#AddArticles" text="Dodaj" />
-                           </children>
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding>
-                        </HBox>
-                        <ProgressBar fx:id="progressBar" layoutX="9.0" layoutY="115.0" prefHeight="30.0" prefWidth="623.0" progress="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding></ProgressBar>
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-        </tabs>
-      </TabPane>
-   </children>
-</VBox>
+<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="580.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nlpprojekt.MainController">
+         <children>
+            <TextFlow fx:id="docSummaryTextFlow" prefHeight="20.0" prefWidth="640.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </TextFlow>
+      <HBox prefHeight="20.0" prefWidth="200.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+         <children>
+            <Label text="Ilość poziomów">
+               <HBox.margin>
+                  <Insets left="740.0" />
+               </HBox.margin>
+            </Label>
+            <Label text="   Max artykułów" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+            <HBox prefHeight="40.0" prefWidth="640.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+               <children>
+                  <TextField fx:id="linkInput" prefHeight="26.0" prefWidth="734.0" promptText="Wpisz link" />
+                  <Spinner fx:id="levelSpinner" editable="true" prefHeight="26.0" prefWidth="87.0" />
+                  <Spinner fx:id="maxSpinner" editable="true" prefHeight="26.0" prefWidth="98.0" />
+                  <Button mnemonicParsing="false" onAction="#AddArticles" text="Dodaj" />
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </HBox>
+            <HBox layoutY="-1.0" prefHeight="40.0" prefWidth="640.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0">
+               <children>
+                  <TextField fx:id="searchInput" prefHeight="26.0" prefWidth="908.0" promptText="Wyszukaj artykuły" />
+                  <Button mnemonicParsing="false" onAction="#search" text="Wyszukaj">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </HBox>
+            <TextFlow fx:id="resultText" layoutX="55.0" layoutY="50.0" prefHeight="539.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="120.0">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </TextFlow>
+            <TextFlow fx:id="resultTextWord2Vec" layoutX="500.0" layoutY="30.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="500.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </TextFlow>
+         </children>
+      </AnchorPane>

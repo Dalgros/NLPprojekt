@@ -19,9 +19,7 @@ public class MainController {
     @FXML
     public Spinner<Integer> levelSpinner, maxSpinner;
     @FXML
-    public TextFlow docSummaryTextFlow, resultText;
-    @FXML
-    public ProgressBar progressBar;
+    public TextFlow docSummaryTextFlow, resultText, resultTextWord2Vec;
 
     @FXML
     private void initialize()
@@ -34,7 +32,7 @@ public class MainController {
     @FXML
     public void AddArticles(ActionEvent actionEvent) throws IOException {
         //https://en.wikipedia.org/wiki/Computer
-        int num = ArticleManager.addWikiArticles(linkInput.getText(), levelSpinner.getValue(), maxSpinner.getValue(), progressBar);
+        int num = ArticleManager.addWikiArticles(linkInput.getText(), levelSpinner.getValue(), maxSpinner.getValue());
         linkInput.setText("");
         docSummaryTextFlow.getChildren().clear();
         docSummaryTextFlow.getChildren().add(new Text("Ilość dokumentów w bazie: " + ArticleManager.getNumberOfArticles()));
@@ -58,18 +56,25 @@ public class MainController {
         Map<String, Double> sortedMap = new LinkedHashMap<>();
         similarArticles.entrySet()
                 .stream()
-                .sorted(Map.Entry.comparingByValue())
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));
 
-        Text textBeforeLink = new Text("The most similar articles are the following:");
+        resultText.getChildren().clear();
+        Text textBeforeLink = new Text("TF-IDF The most similar articles are:");
         resultText.getChildren().add(textBeforeLink);
 
+        int i = 1;
         for(Map.Entry<String, Double> articleEntry : sortedMap.entrySet()) {
             Text entryText = new Text("\nSim: " + String.format("%.5f", articleEntry.getValue()) + " | ");
             Hyperlink link = new Hyperlink(articleEntry.getKey());
             link.setOnAction(openLinkHandler);
             resultText.getChildren().addAll(entryText, link);
+            if(++i > 20) break;
         }
+
+        resultTextWord2Vec.getChildren().clear();
+        Text textBeforeLinkWord2Vec = new Text("Word2Vec The most similar articles are the following:");
+        resultTextWord2Vec.getChildren().add(textBeforeLinkWord2Vec);
     }
 
 

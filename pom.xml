@@ -12,7 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.9.2</junit.version>
-        <javafx.version>17.0.13</javafx.version>
+        <javafx.version>23.0.1</javafx.version>
         <javafx.platform>javafx-controls-mac</javafx.platform>
     </properties>
 
@@ -130,7 +130,6 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.6</version>
         </dependency>
-
     </dependencies>
 
     <build>
