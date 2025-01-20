@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.TextFlow?>
 
-<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="580.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nlpprojekt.MainController">
+<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="610.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nlpprojekt.MainController">
          <children>
             <TextFlow fx:id="docSummaryTextFlow" prefHeight="20.0" prefWidth="640.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <padding>
@@ -40,7 +40,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </HBox>
-            <HBox layoutY="-1.0" prefHeight="40.0" prefWidth="640.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0">
+            <HBox layoutY="-1.0" prefHeight="40.0" prefWidth="640.0" spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
                <children>
                   <TextField fx:id="searchInput" prefHeight="26.0" prefWidth="908.0" promptText="Wyszukaj artykuły" />
                   <Button mnemonicParsing="false" onAction="#search" text="Wyszukaj">
@@ -55,12 +55,12 @@
             </HBox>
             <TextFlow fx:id="resultText" layoutX="55.0" layoutY="50.0" prefHeight="539.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="120.0">
                <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </TextFlow>
             <TextFlow fx:id="resultTextWord2Vec" layoutX="500.0" layoutY="30.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="500.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
                <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </TextFlow>
          </children>

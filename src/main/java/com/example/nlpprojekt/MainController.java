@@ -51,21 +51,27 @@ public class MainController {
             MainApplication.hostServices.showDocument(source.getText()); // Open the hyperlink's text as a URL
         };
 
-        Map<String, Double> similarArticles = ArticleManager.calculateSimilaritiesToInput(searchInput.getText());
+        Map<String, Double> similarArticlesTFIDF = ArticleManager.calculateSimilaritiesToInputTFIDF(searchInput.getText());
+        Map<String, Double> similarArticlesW2V = ArticleManager.calculateSimilaritiesToInputWord2Vec(searchInput.getText());
 
-        Map<String, Double> sortedMap = new LinkedHashMap<>();
-        similarArticles.entrySet()
+        Map<String, Double> sortedMapTFIDF = new LinkedHashMap<>();
+        Map<String, Double> sortedMapW2V = new LinkedHashMap<>();
+        similarArticlesTFIDF.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));
+                .forEachOrdered(x -> sortedMapTFIDF.put(x.getKey(), x.getValue()));
+        similarArticlesW2V.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> sortedMapW2V.put(x.getKey(), x.getValue()));
 
         resultText.getChildren().clear();
         Text textBeforeLink = new Text("TF-IDF The most similar articles are:");
         resultText.getChildren().add(textBeforeLink);
 
         int i = 1;
-        for(Map.Entry<String, Double> articleEntry : sortedMap.entrySet()) {
-            Text entryText = new Text("\nSim: " + String.format("%.5f", articleEntry.getValue()) + " | ");
+        for(Map.Entry<String, Double> articleEntry : sortedMapTFIDF.entrySet()) {
+            Text entryText = new Text("\n" + i + ". Sim: " + String.format("%.5f", articleEntry.getValue()) + " | ");
             Hyperlink link = new Hyperlink(articleEntry.getKey());
             link.setOnAction(openLinkHandler);
             resultText.getChildren().addAll(entryText, link);
@@ -75,6 +81,15 @@ public class MainController {
         resultTextWord2Vec.getChildren().clear();
         Text textBeforeLinkWord2Vec = new Text("Word2Vec The most similar articles are the following:");
         resultTextWord2Vec.getChildren().add(textBeforeLinkWord2Vec);
+
+        int j = 1;
+        for(Map.Entry<String, Double> articleEntry : sortedMapW2V.entrySet()) {
+            Text entryText = new Text("\n" + j + ". Sim: " + String.format("%.5f", articleEntry.getValue()) + " | ");
+            Hyperlink link = new Hyperlink(articleEntry.getKey());
+            link.setOnAction(openLinkHandler);
+            resultTextWord2Vec.getChildren().addAll(entryText, link);
+            if(++j > 20) break;
+        }
     }
 
 

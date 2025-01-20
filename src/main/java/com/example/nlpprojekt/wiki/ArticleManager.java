@@ -1,6 +1,6 @@
 package com.example.nlpprojekt.wiki;
 
-import javafx.scene.control.ProgressBar;
+import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.jsoup.HttpStatusException;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.CoreDocument;
@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 
 public class ArticleManager {
 
@@ -28,7 +27,7 @@ public class ArticleManager {
     static{
         try {
             stopWords = Files.readAllLines(Paths.get("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/stopwords-en.txt"));
-            //wordVectors = WordVectorSerializer.loadStaticModel(new File("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/GoogleNews-vectors-negative300.bin"));
+            wordVectors = WordVectorSerializer.loadStaticModel(new File("/Users/karol/IdeaProjects/NLPprojekt/src/main/resources/GoogleNews-vectors-negative300.bin"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -81,7 +80,7 @@ public class ArticleManager {
             HashMap<String, AtomicInteger> BoW = parseTextAndGetBOW(wikiArticle.getText());
             wikiArticle.setBoW(BoW);
             addToBagOfWords(BoW.keySet());
-            //wikiArticle.setWord2VecSummedVector(getSummedEmbedding(BoW.keySet()));
+            wikiArticle.setWord2VecSummedVector(getSummedEmbedding(BoW.keySet()));
         }
 
         return allCurrentArticles.size();
@@ -147,7 +146,7 @@ public class ArticleManager {
         return localTFIDF;
     }
 
-    public static Map<String, Double> calculateSimilaritiesToInput(String text) {
+    public static Map<String, Double> calculateSimilaritiesToInputTFIDF(String text) {
         Map<String, AtomicInteger> inputBoW = parseTextAndGetBOW(text);
 
         recalculateAllTFIDF();
@@ -157,6 +156,20 @@ public class ArticleManager {
         Map<String, Double> result = new HashMap<>();
         for(Map.Entry<String, WikiArticle> articleEntry: allArticles.entrySet()){
             double similarity = calculateCosineSimilarity(inputTFIDF.values(), articleEntry.getValue().getTFIDF());
+            result.put(articleEntry.getKey(), similarity);
+        }
+
+        return result;
+    }
+
+    public static Map<String, Double> calculateSimilaritiesToInputWord2Vec(String text) {
+        Map<String, AtomicInteger> inputBoW = parseTextAndGetBOW(text);
+
+        List<Double> inputVector = getSummedEmbedding(inputBoW.keySet());
+
+        Map<String, Double> result = new HashMap<>();
+        for(Map.Entry<String, WikiArticle> articleEntry: allArticles.entrySet()){
+            double similarity = calculateCosineSimilarity(inputVector, articleEntry.getValue().getWord2VecSummedVector());
             result.put(articleEntry.getKey(), similarity);
         }
 
@@ -212,8 +225,13 @@ public class ArticleManager {
             for(Map.Entry<String, AtomicInteger> entry : article.getValue().getBoW().entrySet()){
                 bowLine.append(entry.getKey()).append(":").append(entry.getValue()).append(";");
             }
-
             articlesWriter.write(bowLine.substring(0, bowLine.toString().length()-1));
+
+            articlesWriter.write("%%%");
+            articlesWriter.write(String.join(",", article.getValue().getWord2VecSummedVector().stream()
+                    .map(String::valueOf)
+                    .toArray(String[]::new)));
+
             articlesWriter.newLine();
         }
 
@@ -238,12 +256,20 @@ public class ArticleManager {
         while ((articlesLine = articlesReader.readLine()) != null) {
             HashMap<String, AtomicInteger> BoW = new HashMap<>();
             String link = articlesLine.substring(0, articlesLine.indexOf("|||"));
-            List<String> entries = Arrays.stream(articlesLine.substring(articlesLine.indexOf("|||")+3).split(";")).toList();
+
+            String BoWpart = articlesLine.substring(articlesLine.indexOf("|||")+3, articlesLine.indexOf("%%%"));
+            List<String> entries = Arrays.stream(BoWpart.split(";")).toList();
             for(String entry : entries){
                 String[] pair = entry.split(":");
                 BoW.put(pair[0],  new AtomicInteger(Integer.parseInt(pair[1])));
             }
-            allArticles.put(link, new WikiArticle(link, BoW));
+            WikiArticle article = new WikiArticle(link, BoW);
+
+            String W2Vpart = articlesLine.substring(articlesLine.indexOf("%%%")+3);
+            List<Double> list = Arrays.stream(W2Vpart.split(",")).map(Double::parseDouble).toList();
+            article.setWord2VecSummedVector(list);
+
+            allArticles.put(link, article);
         }
         articlesReader.close();
     }
